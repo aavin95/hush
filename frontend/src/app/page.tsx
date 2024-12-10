@@ -1,15 +1,39 @@
 "use client";
 
 import axios from "axios";
-import { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 
-export default function Home() {
+export default function VideoEnhancer() {
   const { data: session } = useSession();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [videos, setVideos] = useState([]);
 
+  // Fetch videos for the logged-in user
+  useEffect(() => {
+    if (!session?.user?.email) return;
+
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch("/api/videos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: session.user.email }),
+        });
+
+        const data = await response.json();
+        setVideos(data);
+      } catch (err) {
+        console.error("Error fetching videos:", err);
+      }
+    };
+
+    fetchVideos();
+  }, [session]);
+
+  // Handle video upload
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       setError("No file selected");
@@ -32,7 +56,7 @@ export default function Home() {
         }
       );
 
-      setSuccessMessage("Video processed successfully! Check your downloads.");
+      setSuccessMessage("Video processed successfully! Check your dashboard.");
       console.log(response.data); // Processed video file URL
     } catch (err) {
       console.error(err);
@@ -47,10 +71,6 @@ export default function Home() {
       <div className="row justify-content-center">
         <div className="col-md-6 text-center">
           <h1 className="mb-4">🎥 Video Audio Enhancer</h1>
-          <p className="lead mb-4">
-            Enhance your video&apos;s audio quality by removing background noise
-            and isolating speech. Upload a video to get started!
-          </p>
 
           {/* Authentication Section */}
           <div className="mb-4">
@@ -70,6 +90,26 @@ export default function Home() {
               </button>
             )}
           </div>
+
+          {/* Dashboard Section */}
+          {session && videos.length > 0 && (
+            <div className="mb-4">
+              <h3>Your Processed Videos</h3>
+              <ul className="list-group">
+                {videos.map((video) => (
+                  <li key={video.id} className="list-group-item">
+                    <a
+                      href={video.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {video.file_url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Upload Form */}
           {session && (
