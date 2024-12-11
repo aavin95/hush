@@ -1,0 +1,29 @@
+{
+  "name": "hush",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "lib"
+  ],
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.0.1",
+    "express": "^4.21.2",
+    "lib": "^1.0.0",
+    "prisma": "^6.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
