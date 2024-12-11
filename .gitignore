@@ -24,6 +24,9 @@ node_modules/
 build/
 dist/
 .env
+.env.local
+.env.development
+.env.production
 
 # Rust
 target/
