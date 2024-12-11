@@ -1,10 +1,10 @@
-/* eslint-disable no-var */ // Disable the no-var rule for this block
+// lib/prisma.ts
+
 import { PrismaClient } from "@prisma/client";
 
 declare global {
   var prisma: PrismaClient | undefined;
 }
-/* eslint-enable no-var */ // Re-enable the rule after the block
 
 let prisma: PrismaClient;
 
