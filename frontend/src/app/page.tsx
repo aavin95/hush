@@ -1,8 +1,12 @@
+// components/VideoEnhancer.tsx
+
 "use client";
 
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import Auth from "../../components/Auth";
+import toast, { Toaster } from "react-hot-toast";
 
 type Video = {
   id: string;
@@ -10,28 +14,26 @@ type Video = {
 };
 
 export default function VideoEnhancer() {
-  const { data: session } = useSession();
+  const supabase = useSupabaseClient();
+  const session = useSession();
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
 
-  // Fetch videos for the logged-in user
+  // Fetch videos when session changes
   useEffect(() => {
-    if (!session?.user?.email) return;
-
     const fetchVideos = async () => {
-      try {
-        const response = await fetch("/api/videos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: session.user?.email }),
-        });
+      if (!session) return;
 
-        const data = await response.json();
-        setVideos(data);
+      try {
+        const response = await axios.post("/api/videos", {});
+        if (response.status === 200) {
+          setVideos(response.data);
+        } else {
+          toast.error("Failed to fetch videos.");
+        }
       } catch (err) {
         console.error("Error fetching videos:", err);
+        toast.error("An error occurred while fetching videos.");
       }
     };
 
@@ -41,31 +43,49 @@ export default function VideoEnhancer() {
   // Handle video upload
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
-      setError("No file selected");
+      toast.error("No file selected");
       return;
     }
 
     setUploading(true);
-    setError(null);
-    setSuccessMessage(null);
+    const loadingToastId = toast.loading(
+      "Uploading and processing your video..."
+    );
 
     const formData = new FormData();
     formData.append("video", e.target.files[0]);
 
     try {
+      const token = session?.access_token;
+
       const response = await axios.post(
         "http://localhost:3001/upload",
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      setSuccessMessage("Video processed successfully! Check your dashboard.");
-      console.log(response.data); // Processed video file URL
+      if (response.status === 200) {
+        toast.success("Video processed successfully! Check your dashboard.", {
+          id: loadingToastId,
+        });
+        // Optionally, refresh the videos list
+        const videosResponse = await axios.post("/api/videos", {});
+        if (videosResponse.status === 200) {
+          setVideos(videosResponse.data);
+        }
+      } else {
+        toast.error("Failed to process video.", { id: loadingToastId });
+      }
     } catch (err) {
       console.error(err);
-      setError("An error occurred during the upload. Please try again.");
+      toast.error("An error occurred during the upload. Please try again.", {
+        id: loadingToastId,
+      });
     } finally {
       setUploading(false);
     }
@@ -74,51 +94,14 @@ export default function VideoEnhancer() {
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
+        <Toaster />
         <div className="col-md-6 text-center">
           <h1 className="mb-4">🎥 Video Audio Enhancer</h1>
-
-          {/* Authentication Section */}
-          <div className="mb-4">
-            {session ? (
-              <div>
-                <p>Welcome, {session.user?.name}!</p>
-                <button className="btn btn-danger" onClick={() => signOut()}>
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <button
-                className="btn btn-primary"
-                onClick={() => signIn("google")}
-              >
-                Sign In with Google
-              </button>
-            )}
-          </div>
-
-          {/* Dashboard Section */}
-          {session && videos.length > 0 && (
-            <div className="mb-4">
-              <h3>Your Processed Videos</h3>
-              <ul className="list-group">
-                {videos.map((video) => (
-                  <li key={video.id} className="list-group-item">
-                    <a
-                      href={video.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {video.file_url}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <Auth />
 
           {/* Upload Form */}
-          {session && (
-            <div className="card shadow p-4">
+          {session && session.user && (
+            <div className="card shadow p-4 mb-4">
               <form>
                 <div className="mb-3">
                   <label htmlFor="fileUpload" className="form-label">
@@ -137,17 +120,33 @@ export default function VideoEnhancer() {
                     Uploading and processing your video. Please wait...
                   </div>
                 )}
-                {error && (
-                  <div className="alert alert-danger" role="alert">
-                    {error}
-                  </div>
-                )}
-                {successMessage && (
-                  <div className="alert alert-success" role="alert">
-                    {successMessage}
-                  </div>
-                )}
               </form>
+            </div>
+          )}
+
+          {/* Display Videos */}
+          {session && session.user && (
+            <div className="card shadow p-4">
+              <h3 className="mb-3">Your Videos</h3>
+              {videos.length === 0 ? (
+                <p>You have no uploaded videos.</p>
+              ) : (
+                <div className="list-group">
+                  {videos.map((video) => (
+                    <div key={video.id} className="mb-3">
+                      <p>Video ID: {video.id}</p>
+                      {video.file_url ? (
+                        <video width="320" height="240" controls>
+                          <source src={video.file_url} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : (
+                        <p className="text-danger">Unable to load video URL.</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

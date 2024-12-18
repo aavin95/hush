@@ -1,7 +1,7 @@
 // app/layout.tsx
 "use client";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { SessionProvider } from "next-auth/react";
+import SupabaseProvider from "../../lib/SupabaseProvider";
 
 export default function RootLayout({
   children,
@@ -11,7 +11,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SupabaseProvider>{children}</SupabaseProvider>
       </body>
     </html>
   );

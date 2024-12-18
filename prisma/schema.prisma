@@ -7,17 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  videos        Video[]
-}
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -31,7 +20,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id])
+  user              user    @relation(fields: [userId], references: [id])
 
   @@unique([provider, providerAccountId])
 }
@@ -41,7 +30,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id])
+  user         user     @relation(fields: [userId], references: [id])
 }
 
 model VerificationToken {
@@ -53,8 +42,19 @@ model VerificationToken {
 }
 
 model Video {
-  id       String @id @default(cuid())
+  id       String @id @default(dbgenerated("gen_random_uuid()"))
   file_url String
   userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  user     user   @relation(fields: [userId], references: [id])
+}
+
+model user {
+  id            String    @id(map: "User_pkey") @default(dbgenerated("gen_random_uuid()"))
+  name          String?
+  email         String?   @unique(map: "User_email_key")
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  videos        Video[]
 }

@@ -1,27 +1,46 @@
 import { NextResponse } from "next/server";
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import prisma from "../../../../../lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json();
+    const supabase = createRouteHandlerClient({ cookies });
 
-    // Replace this with actual database fetching logic
-    const videos = [
-      { id: "1", file_url: "https://example.com/video1.mp4" },
-      { id: "2", file_url: "https://example.com/video2.mp4" },
-    ];
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
-    if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (error || !session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Filter videos by user email (dummy example)
-    const userVideos = videos.filter((video) => video.file_url.includes(email));
+    const userId = session.user.id;
 
-    return NextResponse.json(userVideos);
-  } catch (err) {
-    console.error(err);
+    // Fetch videos for the user
+    const userVideos = await prisma.video.findMany({
+      where: { userId },
+      select: { id: true, file_url: true },
+    });
+
+    // Check if file_url is already a full URL
+    const publicVideos = userVideos.map((video) => {
+      const fileUrl = video.file_url.startsWith("http")
+        ? video.file_url // Use directly if it's already a full URL
+        : `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${video.file_url}`;
+      console.log(fileUrl);
+      return {
+        id: video.id,
+        file_url: fileUrl,
+      };
+    });
+
+    return NextResponse.json(publicVideos, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching videos:", error);
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

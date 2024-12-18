@@ -5,6 +5,14 @@ declare global {
     interface Global {
       prisma: PrismaClient | undefined;
     }
+    interface Session {
+      user: {
+        name?: string | null;
+        email?: string | null;
+        image?: string | null;
+        token?: string;
+      };
+    }
   }
 }
 
