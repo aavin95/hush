@@ -1,10 +1,47 @@
-// components/Auth.tsx
-
 "use client";
 
 import React from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useEffect } from "react";
+import styled from "styled-components";
+
+// Styled Components
+const AuthButtonContainer = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+`;
+
+const StyledButton = styled.button`
+  background: linear-gradient(135deg, #1e90ff 0%, #0066cc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-left: 10px;
+
+  &:hover {
+    background: linear-gradient(135deg, #0066cc 0%, #005bb5 100%);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const SignOutButton = styled(StyledButton)`
+  background: #ff6666;
+
+  &:hover {
+    background: #e65555;
+  }
+`;
 
 export default function Auth() {
   const session = useSession();
@@ -22,40 +59,13 @@ export default function Auth() {
     if (error) console.error("Error signing out:", error);
   };
 
-  useEffect(() => {
-    const createUserInDB = async (): Promise<void> => {
-      if (session) {
-        const { user } = session;
-        const res = await fetch("/api/createUser", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: user.id,
-            email: user.email,
-            name: user.user_metadata?.full_name || user.email, // Adjust based on your metadata
-            image: user.user_metadata?.avatar_url || "",
-          }),
-        });
-
-        if (!res.ok) {
-          console.error("Failed to create user in DB");
-        }
-      }
-    };
-
-    createUserInDB();
-  }, [session]);
-
-  if (session) {
-    return (
-      <div>
-        <p>Signed in as {session.user.email}</p>
-        <button onClick={signOut}>Sign Out</button>
-      </div>
-    );
-  }
-
-  return <button onClick={signInWithGoogle}>Sign in with Google</button>;
+  return (
+    <AuthButtonContainer>
+      {session ? (
+        <SignOutButton onClick={signOut}>Sign Out</SignOutButton>
+      ) : (
+        <StyledButton onClick={signInWithGoogle}>Sign In</StyledButton>
+      )}
+    </AuthButtonContainer>
+  );
 }

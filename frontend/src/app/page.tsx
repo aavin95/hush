@@ -259,9 +259,7 @@ export default function VideoEnhancer() {
         <ContentWrapper>
           <Toaster />
           <Title>🎥 Video Audio Enhancer</Title>
-          <Card>
-            <Auth />
-          </Card>
+          <Auth />
 
           {session && session.user && (
             <Card>
