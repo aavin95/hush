@@ -1,5 +1,3 @@
-// components/VideoEnhancer.tsx
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,17 +5,175 @@ import axios from "axios";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import Auth from "../../components/Auth";
 import toast, { Toaster } from "react-hot-toast";
+import styled, { createGlobalStyle } from "styled-components";
 
 type Video = {
   id: string;
   file_url: string;
 };
 
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #1D1F21 0%, #2F3133 100%);
+    color: #FFFFFF;
+  }
+`;
+
+const PageWrapper = styled.div`
+  display: flex;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 50px 20px;
+`;
+
+const ContentWrapper = styled.div`
+  max-width: 600px;
+  width: 100%;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #f9f9f9;
+  font-size: 2rem;
+`;
+
+const Card = styled.div`
+  background: #2d2f31;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+`;
+
+const CardTitle = styled.h3`
+  margin-bottom: 15px;
+  color: #f9f9f9;
+  font-size: 1.2rem;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+`;
+
+const FileInput = styled.input`
+  display: block;
+  width: 100%;
+  border: 1px solid #444;
+  background: #1e1f21;
+  color: #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+
+  &::file-selector-button {
+    background: #3f4143;
+    border: none;
+    padding: 8px 12px;
+    color: #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+`;
+
+const Alert = styled.div<{ type?: "info" | "warning" }>`
+  background: ${({ type }) => (type === "info" ? "#1E90FF" : "#FFA500")};
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  text-align: center;
+  color: #fff;
+`;
+
+const VideoList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+`;
+
+const VideoItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: #232527;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const Thumbnail = styled.video`
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  background: #000;
+
+  /* When video is fullscreen */
+  &:fullscreen {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Safari-specific fullscreen support */
+  &::-webkit-media-controls-fullscreen-button {
+    object-fit: contain;
+  }
+
+  /* Adjust for different video aspect ratios */
+  @media (min-aspect-ratio: 9/16) {
+    &:fullscreen {
+      width: auto;
+      height: 100%;
+    }
+  }
+
+  @media (max-aspect-ratio: 9/16) {
+    &:fullscreen {
+      width: 100%;
+      height: auto;
+    }
+  }
+`;
+
+const VideoDetails = styled.div`
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  color: #ccc;
+`;
+
+const VideoTitle = styled.p`
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #fff;
+`;
+
+const VideoID = styled.span`
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 4px;
+`;
+
 export default function VideoEnhancer() {
   const supabase = useSupabaseClient();
   const session = useSession();
   const [uploading, setUploading] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [hasMounted, setHasMounted] = useState(false);
 
   // Fetch videos when session changes
   useEffect(() => {
@@ -36,6 +192,7 @@ export default function VideoEnhancer() {
         toast.error("An error occurred while fetching videos.");
       }
     };
+    setHasMounted(true);
 
     fetchVideos();
   }, [session]);
@@ -91,72 +248,79 @@ export default function VideoEnhancer() {
     }
   };
 
-  return (
-    <div className="container py-5">
-      <div className="row justify-content-center">
-        <Toaster />
-        <div className="col-md-6 text-center">
-          <h1 className="mb-4">🎥 Video Audio Enhancer</h1>
-          <Auth />
+  if (!hasMounted) {
+    return null;
+  }
 
-          {/* Upload Form */}
+  return (
+    <>
+      <GlobalStyle />
+      <PageWrapper>
+        <ContentWrapper>
+          <Toaster />
+          <Title>🎥 Video Audio Enhancer</Title>
+          <Card>
+            <Auth />
+          </Card>
+
           {session && session.user && (
-            <div className="card shadow p-4 mb-4">
+            <Card>
               <form>
-                <div className="mb-3">
-                  <label htmlFor="fileUpload" className="form-label">
-                    Select a video file
-                  </label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    id="fileUpload"
-                    onChange={handleUpload}
-                    disabled={uploading}
-                  />
-                </div>
+                <Label htmlFor="fileUpload">Select a video file</Label>
+                <FileInput
+                  type="file"
+                  id="fileUpload"
+                  onChange={handleUpload}
+                  disabled={uploading}
+                />
                 {uploading && (
-                  <div className="alert alert-info" role="alert">
+                  <Alert type="info">
                     Uploading and processing your video. Please wait...
-                  </div>
+                  </Alert>
                 )}
               </form>
-            </div>
+            </Card>
           )}
 
-          {/* Display Videos */}
           {session && session.user && (
-            <div className="card shadow p-4">
-              <h3 className="mb-3">Your Videos</h3>
+            <Card>
+              <CardTitle>Your Videos</CardTitle>
               {videos.length === 0 ? (
                 <p>You have no uploaded videos.</p>
               ) : (
-                <div className="list-group">
+                <VideoList>
                   {videos.map((video) => (
-                    <div key={video.id} className="mb-3">
-                      <p>Video ID: {video.id}</p>
+                    <VideoItem key={video.id}>
                       {video.file_url ? (
-                        <video width="320" height="240" controls>
-                          <source src={video.file_url} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
+                        <>
+                          <Thumbnail controls>
+                            <source src={video.file_url} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </Thumbnail>
+                          <VideoDetails>
+                            <VideoTitle>Video Preview</VideoTitle>
+                            <VideoID>ID: {video.id}</VideoID>
+                          </VideoDetails>
+                        </>
                       ) : (
-                        <p className="text-danger">Unable to load video URL.</p>
+                        <p style={{ color: "#ff6666" }}>
+                          Unable to load video URL.
+                        </p>
                       )}
-                    </div>
+                    </VideoItem>
                   ))}
-                </div>
+                </VideoList>
               )}
-            </div>
+            </Card>
           )}
 
           {!session && (
-            <div className="alert alert-warning mt-4">
+            <Alert type="warning">
               Please sign in to upload and process videos.
-            </div>
+            </Alert>
           )}
-        </div>
-      </div>
-    </div>
+        </ContentWrapper>
+      </PageWrapper>
+    </>
   );
 }
