@@ -1,16 +1,20 @@
 // app/api/createUser/route.ts
+"cookies-next";
 
 import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { PrismaClient } from "@prisma/client";
+import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     // Initialize Supabase client with the correct cookies format
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient({
+      cookies: cookies as unknown as () => Promise<ReadonlyRequestCookies>,
+    });
 
     // Retrieve the session
     const {

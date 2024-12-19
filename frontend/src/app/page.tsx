@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 import Auth from "../../components/Auth";
 import toast, { Toaster } from "react-hot-toast";
 import styled, { createGlobalStyle } from "styled-components";
@@ -169,7 +169,6 @@ const VideoID = styled.span`
 `;
 
 export default function VideoEnhancer() {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const [uploading, setUploading] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
@@ -181,7 +180,7 @@ export default function VideoEnhancer() {
       if (!session) return;
 
       try {
-        const response = await axios.post("/api/videos", {});
+        const response = await axios.get("/api/videos");
         if (response.status === 200) {
           setVideos(response.data);
         } else {

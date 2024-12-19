@@ -1,11 +1,16 @@
+"cookies-next";
+
 import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import prisma from "../../../../../lib/prisma";
+import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
-export async function POST(request: Request) {
+export async function GET() {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient({
+      cookies: cookies as unknown as () => Promise<ReadonlyRequestCookies>,
+    });
 
     const {
       data: { session },
