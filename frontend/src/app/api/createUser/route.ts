@@ -7,6 +7,8 @@ import { cookies } from "next/headers";
 import { PrismaClient } from "@prisma/client";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
+export const dynamic = "force-dynamic";
+
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {

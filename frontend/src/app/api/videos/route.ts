@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import prisma from "../../../../../lib/prisma";
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const supabase = createRouteHandlerClient({
