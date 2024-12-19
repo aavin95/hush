@@ -42,3 +42,13 @@ docs/_build/
 # IDE
 .idea/
 .vscode/
+
+
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Temporary files
+temp/

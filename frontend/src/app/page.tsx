@@ -235,6 +235,7 @@ export default function VideoEnhancer() {
         if (videosResponse.status === 200) {
           setVideos(videosResponse.data);
         }
+        e.target.value = "";
       } else {
         toast.error("Failed to process video.", { id: loadingToastId });
       }
