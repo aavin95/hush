@@ -17,14 +17,13 @@ const prisma_1 = __importDefault(require("./lib/prisma"));
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield prisma_1.default.user.findMany();
-        console.log(users);
     });
 }
 main()
     .catch((e) => {
-    console.error(e);
-    process.exit(1);
-})
+        console.error(e);
+        process.exit(1);
+    })
     .finally(() => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.default.$disconnect();
-}));
+        yield prisma_1.default.$disconnect();
+    }));

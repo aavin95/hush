@@ -68,8 +68,6 @@ app.post("/upload", authenticateUser, upload.single("video"), async (req, res) =
     ffmpeg(videoPath)
         .output(audioPath)
         .on("end", () => {
-            console.log("Audio extraction completed:", audioPath);
-
             // Step 2: Process audio
             exec(
                 `python3.11 scripts/process_audio.py ${audioPath} ${processedAudioPath}`,
@@ -79,20 +77,13 @@ app.post("/upload", authenticateUser, upload.single("video"), async (req, res) =
                         cleanUp([videoPath, audioPath, processedAudioPath]);
                         return res.status(500).send("Audio processing failed");
                     }
-
-                    console.log("Audio processing completed:", processedAudioPath);
-
                     // Step 3: Merge audio back into video
                     ffmpeg(videoPath)
                         .addInput(processedAudioPath)
                         .outputOptions(["-map 0:v:0", "-map 1:a:0", "-c:v copy", "-shortest"])
                         .output(outputVideoPath)
                         .on("end", async () => {
-                            console.log("Video processing completed:", outputVideoPath);
                             const filePath = `${userId}/${uuidv4()}.mp4`;
-
-                            console.log("Uploading file to path:", filePath);
-
                             const { data, error } = await supabaseAdmin.storage
                                 .from("videos")
                                 .upload(
@@ -110,9 +101,6 @@ app.post("/upload", authenticateUser, upload.single("video"), async (req, res) =
                                 cleanUp([videoPath, audioPath, processedAudioPath, outputVideoPath]);
                                 return res.status(500).send("Video upload failed");
                             }
-
-                            console.log("Uploaded video to Supabase");
-
                             // Generate public URL for the uploaded video
                             const { data: publicUrlData } = supabaseAdmin.storage
                                 .from("videos")
@@ -169,5 +157,4 @@ const cleanUp = (filePaths) => {
 
 // Start the backend server
 app.listen(3001, () => {
-    console.log("Backend running on http://localhost:3001");
 });

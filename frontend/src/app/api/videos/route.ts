@@ -29,7 +29,6 @@ export async function POST(request: Request) {
       const fileUrl = video.file_url.startsWith("http")
         ? video.file_url // Use directly if it's already a full URL
         : `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${video.file_url}`;
-      console.log(fileUrl);
       return {
         id: video.id,
         file_url: fileUrl,
