@@ -92,7 +92,6 @@ loguru==0.7.3
 lxml==4.9.1
 madoop==1.0.2
 # Editable install with no version control (mapreduce==1.0.0)
--e /Users/andrewvincent/Desktop/School/Winter_2023/EECS_485/eecs485p4/eecs485p4
 MarkupSafe==2.1.1
 marshmallow==3.22.0
 matplotlib==3.9.2
