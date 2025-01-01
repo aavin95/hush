@@ -52,6 +52,7 @@ export default function Auth() {
       provider: "google",
       options: {
         skipBrowserRedirect: false,
+        redirectTo: process.env.NEXT_PUBLIC_SITE_URL,
       },
     });
     if (error) console.error("Error signing in:", error);
