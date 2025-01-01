@@ -1,3 +1,5 @@
+"""Flask server for video processing and storage with Supabase integration."""
+
 import os
 import uuid
 import subprocess
@@ -28,6 +30,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def authenticate_user():
+    """Verify user authentication using Supabase token from request headers."""
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
         print("No authorization header found or invalid format.")
@@ -44,6 +47,7 @@ def authenticate_user():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    """Process and store uploaded video files with audio enhancement."""
     print("Upload endpoint hit.")
     # Authenticate user
     user = authenticate_user()
@@ -77,7 +81,8 @@ def upload():
     try:
         print("Extracting audio from video...")
         subprocess.run(
-            ["ffmpeg", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2", audio_path],
+            ["ffmpeg", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2",
+             audio_path],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -161,10 +166,16 @@ def upload():
     return "Video processed and uploaded successfully", 200
 
 def cleanup(file_paths):
+    """Remove temporary files from the given list of file paths."""
     for fp in file_paths:
         if os.path.exists(fp):
             os.remove(fp)
             print(f"Cleaned up file: {fp}")
+
+@app.route("/")
+def index():
+    """Return a simple hello world message."""
+    return "Hello World"
 
 if __name__ == "__main__":
     # Run the Flask app on port 3001
