@@ -104,6 +104,8 @@ def upload():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+        # Clear the unedited audio file
+        os.remove(audio_path)
         print("Audio processing completed.")
     except subprocess.CalledProcessError as e:
         cleanup([video_path, audio_path, processed_audio_path])
