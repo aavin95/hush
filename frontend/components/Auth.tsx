@@ -52,8 +52,8 @@ export default function Auth() {
       provider: "google",
       options: {
         skipBrowserRedirect: false,
-        redirectTo: window.location.origin
-      }
+        redirectTo: window.location.origin,
+      },
     });
     if (error) console.error("Error signing in:", error);
   };
