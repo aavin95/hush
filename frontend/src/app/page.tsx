@@ -198,6 +198,8 @@ export default function VideoEnhancer() {
   }, [session]);
 
   // Handle video upload
+  // UNCOMMENT THIS CODE IF YOU WANT TO REVERT TO THE ORIGINAL CODE
+  /*
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       toast.error("No file selected");
@@ -248,6 +250,7 @@ export default function VideoEnhancer() {
       setUploading(false);
     }
   };
+  */
 
   if (!hasMounted) {
     return null;
