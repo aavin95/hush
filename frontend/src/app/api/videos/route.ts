@@ -22,17 +22,24 @@ export async function GET() {
     if (error || !session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const userId = session.user.id;
+    // UNCOMMENT THIS TO GET USER VIDEOS
+    // const userId = session.user.id;
 
     // Fetch videos for the user
-    const userVideos = await prisma.video.findMany({
-      where: { userId },
+    // UNCOMMENT THIS TO GET USER VIDEOS
+    // const userVideos = await prisma.video.findMany({
+    //   where: { userId },
+    //   select: { id: true, file_url: true },
+    // });
+
+    const allVideos = await prisma.video.findMany({
       select: { id: true, file_url: true },
     });
 
     // Check if file_url is already a full URL
-    const publicVideos = userVideos.map((video) => {
+    // UNCOMMENT THIS TO GET USER VIDEOS
+    // const publicVideos = userVideos.map((video) => {
+    const publicVideos = allVideos.map((video) => {
       const fileUrl = video.file_url.startsWith("http")
         ? video.file_url // Use directly if it's already a full URL
         : `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/videos/${video.file_url}`;
