@@ -172,7 +172,8 @@ export default function VideoEnhancer() {
   // Fetch videos when session changes
   useEffect(() => {
     const fetchVideos = async () => {
-      if (!session) return;
+      // UNCOMMENT THIS TO GET USER VIDEOS
+      // if (!session) return;
 
       try {
         const response = await axios.get("/api/videos");
@@ -252,6 +253,12 @@ export default function VideoEnhancer() {
 
   return (
     <>
+      <header>
+        <link
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️ </text></svg>"
+        />
+      </header>
       <GlobalStyle />
       <PageWrapper>
         <ContentWrapper>

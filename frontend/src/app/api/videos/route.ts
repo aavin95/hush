@@ -10,6 +10,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    // UNCOMMENT THIS TO GET USER VIDEOS
+    /*
     const supabase = createRouteHandlerClient({
       cookies: cookies as unknown as () => Promise<ReadonlyRequestCookies>,
     });
@@ -22,15 +24,15 @@ export async function GET() {
     if (error || !session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    // UNCOMMENT THIS TO GET USER VIDEOS
-    // const userId = session.user.id;
+    const userId = session.user.id;
 
-    // Fetch videos for the user
-    // UNCOMMENT THIS TO GET USER VIDEOS
-    // const userVideos = await prisma.video.findMany({
-    //   where: { userId },
-    //   select: { id: true, file_url: true },
-    // });
+    Fetch videos for the user
+    UNCOMMENT THIS TO GET USER VIDEOS
+    const userVideos = await prisma.video.findMany({
+      where: { userId },
+      select: { id: true, file_url: true },
+    });
+    */
 
     const allVideos = await prisma.video.findMany({
       select: { id: true, file_url: true },
