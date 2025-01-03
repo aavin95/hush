@@ -84,15 +84,15 @@ const CardTitle = styled.h3`
 //   }
 // `;
 
-const Alert = styled.div<{ type?: "info" | "warning" }>`
-  background: ${({ type }) => (type === "info" ? "#1E90FF" : "#FFA500")};
-  padding: 10px 15px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  margin-top: 10px;
-  text-align: center;
-  color: #fff;
-`;
+// const Alert = styled.div<{ type?: "info" | "warning" }>`
+//   background: ${({ type }) => (type === "info" ? "#1E90FF" : "#FFA500")};
+//   padding: 10px 15px;
+//   border-radius: 4px;
+//   font-size: 0.9rem;
+//   margin-top: 10px;
+//   text-align: center;
+//   color: #fff;
+// `;
 
 const VideoList = styled.div`
   display: grid;
@@ -279,7 +279,8 @@ export default function VideoEnhancer() {
             </Card>
           )}
           */}
-          {session && session.user && (
+          {
+            /*session && session.user && ( */
             <Card>
               <CardTitle>Service Unavailable</CardTitle>
               <p>
@@ -292,9 +293,11 @@ export default function VideoEnhancer() {
                 reach out to me at aavin@umich.edu.
               </p>
             </Card>
-          )}
+            /*)*/
+          }
 
-          {session && session.user && (
+          {
+            /*session && session.user && ( */
             <Card>
               <CardTitle>Sample Videos</CardTitle>
               {videos.length === 0 ? (
@@ -327,13 +330,17 @@ export default function VideoEnhancer() {
                 </VideoList>
               )}
             </Card>
-          )}
+            /*)
+             */
+          }
 
+          {/*
           {!session && (
             <Alert type="warning">
               Please sign in to upload and process videos.
             </Alert>
           )}
+          */}
           <GitHubButton />
         </ContentWrapper>
       </PageWrapper>
