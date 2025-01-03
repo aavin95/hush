@@ -52,6 +52,9 @@ def authenticate_user():
 def upload():
     """Process and store uploaded video files with audio enhancement."""
     print("Upload endpoint hit.")
+    print(f"Temp folder exists: {os.path.exists(app.config['UPLOAD_FOLDER'])}")
+    print(f"Temp folder writable: {os.access(app.config['UPLOAD_FOLDER'], os.W_OK)}")
+
     # Authenticate user
     user = authenticate_user()
     if user is None:
@@ -83,13 +86,15 @@ def upload():
     # 1. Extract audio from video using ffmpeg
     try:
         print("Extracting audio from video...")
-        subprocess.run(
+        result = subprocess.run(
             ["ffmpeg", "-i", video_path, "-vn", "-acodec", "pcm_s16le", "-ar", "44100", "-ac", "2",
              audio_path],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
+        print("Subprocess stdout:", result.stdout.decode())
+        print("Subprocess stderr:", result.stderr.decode())
         print("Audio extraction completed.")
     except subprocess.CalledProcessError as e:
         cleanup([video_path])

@@ -6,12 +6,17 @@ import os
 def enhance_audio(input_path, output_path):
     """Enhance audio from the input path and save it to the output path."""
     print("Test that we hit this in enhance_audio.py")
-    model, df_state, _ = init_df()
+    try:
+        model, df_state, _ = init_df()
+    except Exception as e:
+        print(f"Error in init_df: {e}")
+        raise
     print(f"input_path: {input_path}")
     print(f"output_path: {output_path}")
     try:
         try:
             audio, _ = load_audio(input_path, sr=df_state.sr())
+            print(f"Audio size after loading: {len(audio)} samples")
         except Exception as e:
             print(f"Error in load_audio: {e}")
             raise
@@ -40,4 +45,5 @@ def enhance_audio(input_path, output_path):
 if __name__ == "__main__":
     input_path = sys.argv[1]
     output_path = sys.argv[2]
+    print("test we got to line 44 in enhance_audio.py")
     enhance_audio(input_path, output_path)
