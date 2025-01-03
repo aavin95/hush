@@ -57,32 +57,32 @@ const CardTitle = styled.h3`
   font-size: 1.2rem;
 `;
 
-const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-`;
+// const Label = styled.label`
+//   display: block;
+//   margin-bottom: 8px;
+//   font-weight: 500;
+// `;
 
-const FileInput = styled.input`
-  display: block;
-  width: 100%;
-  border: 1px solid #444;
-  background: #1e1f21;
-  color: #ddd;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
+// const FileInput = styled.input`
+//   display: block;
+//   width: 100%;
+//   border: 1px solid #444;
+//   background: #1e1f21;
+//   color: #ddd;
+//   padding: 10px;
+//   border-radius: 4px;
+//   font-size: 0.9rem;
+//   margin-bottom: 10px;
 
-  &::file-selector-button {
-    background: #3f4143;
-    border: none;
-    padding: 8px 12px;
-    color: #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-`;
+//   &::file-selector-button {
+//     background: #3f4143;
+//     border: none;
+//     padding: 8px 12px;
+//     color: #ddd;
+//     border-radius: 4px;
+//     cursor: pointer;
+//   }
+// `;
 
 const Alert = styled.div<{ type?: "info" | "warning" }>`
   background: ${({ type }) => (type === "info" ? "#1E90FF" : "#FFA500")};
@@ -163,15 +163,9 @@ const VideoTitle = styled.p`
   color: #fff;
 `;
 
-const VideoID = styled.span`
-  font-size: 0.8rem;
-  color: #aaa;
-  margin-top: 4px;
-`;
-
 export default function VideoEnhancer() {
   const session = useSession();
-  const [uploading, setUploading] = useState(false);
+  //const [uploading, setUploading] = useState(false);
   const [videos, setVideos] = useState<Video[]>([]);
   const [hasMounted, setHasMounted] = useState(false);
 
