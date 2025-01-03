@@ -214,8 +214,7 @@ export default function VideoEnhancer() {
     try {
       const token = session?.access_token;
       const response = await axios.post(
-        //`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
-        "http://localhost:3001/upload",
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
         formData,
         {
           headers: {

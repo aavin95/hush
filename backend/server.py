@@ -73,9 +73,9 @@ def upload():
     print(f"Video saved to {video_path}")
 
     # Prepare file paths
-    audio_path = video_path + ".wav"
-    processed_audio_path = video_path + "-processed.wav"
-    output_video_path = video_path + "-output.mp4"
+    audio_path = os.path.splitext(video_path)[0] + ".wav"
+    processed_audio_path = os.path.splitext(video_path)[0] + "-processed.wav"
+    output_video_path = os.path.splitext(video_path)[0] + "-output.mp4"
 
     user_id = user.id
 
