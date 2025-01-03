@@ -5,6 +5,7 @@ from subprocess import call
 
 def process_audio(input_file, output_file):
     # Pass audio through DeepFilterNet
+    print(f"Test that we hit this in process_audio.py")
     print(f"Processing audio from {input_file} to {output_file}")
     abs_input_path = os.path.abspath(input_file)
     abs_output_path = os.path.abspath(output_file)
