@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSession } from "@supabase/auth-helpers-react";
 import Auth from "../../components/Auth";
+import GitHubButton from "../../components/GitHubButton";
 import toast, { Toaster } from "react-hot-toast";
 import styled, { createGlobalStyle } from "styled-components";
 
@@ -214,7 +215,8 @@ export default function VideoEnhancer() {
     try {
       const token = session?.access_token;
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
+        //`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
+        "http://localhost:3001/upload",
         formData,
         {
           headers: {
@@ -259,7 +261,8 @@ export default function VideoEnhancer() {
           <Toaster />
           <Title>🎥 Video Audio Enhancer</Title>
           <Auth />
-
+          {/*
+          // THIS IS THE ORIGINAL CODE AND IF YOU WANT TO REVERT TO IT, UNCOMMENT THE FOLLOWING CODE  
           {session && session.user && (
             <Card>
               <form>
@@ -278,10 +281,25 @@ export default function VideoEnhancer() {
               </form>
             </Card>
           )}
+          */}
+          {session && session.user && (
+            <Card>
+              <CardTitle>Service Unavailable</CardTitle>
+              <p>
+                We regret to inform you that this service is no longer available
+                due to limited financial resources and the high compute costs
+                required to run it. Below, you’ll find examples of videos edited
+                by the application. If you’d like, you can clone the repository
+                and run your own instance. For questions, feedback, or
+                suggestions on how to improve the application, feel free to
+                reach out to me at aavin@umich.edu.
+              </p>
+            </Card>
+          )}
 
           {session && session.user && (
             <Card>
-              <CardTitle>Your Videos</CardTitle>
+              <CardTitle>Sample Videos</CardTitle>
               {videos.length === 0 ? (
                 <p>You have no uploaded videos.</p>
               ) : (
@@ -295,8 +313,11 @@ export default function VideoEnhancer() {
                             Your browser does not support the video tag.
                           </Thumbnail>
                           <VideoDetails>
-                            <VideoTitle>Video Preview</VideoTitle>
-                            <VideoID>ID: {video.id}</VideoID>
+                            <VideoTitle>
+                              {videos[0] == video || videos[1] == video
+                                ? "Processed Video"
+                                : "Original Video"}
+                            </VideoTitle>
                           </VideoDetails>
                         </>
                       ) : (
@@ -316,6 +337,7 @@ export default function VideoEnhancer() {
               Please sign in to upload and process videos.
             </Alert>
           )}
+          <GitHubButton />
         </ContentWrapper>
       </PageWrapper>
     </>
