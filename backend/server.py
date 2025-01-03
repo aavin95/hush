@@ -8,6 +8,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from supabase import create_client, Client
 import shutil
+import time
 
 load_dotenv()
 
@@ -98,13 +99,23 @@ def upload():
     # 2. Process audio with the Python script
     try:
         print("Processing audio...")
-        subprocess.run(
+        result = subprocess.run(
             ["python3.11", "scripts/process_audio.py", audio_path, processed_audio_path],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
         print("Audio processing completed.")
+
+        # Add verification step
+        time.sleep(1)  # Wait 1 second for filesystem to sync
+        if not os.path.exists(processed_audio_path) or os.path.getsize(processed_audio_path) == 0:
+            print(f"Processed audio file not found or empty: {processed_audio_path}")
+            print("Process output:", result.stdout.decode())
+            print("Process errors:", result.stderr.decode())
+            raise FileNotFoundError("Processed audio file not found or empty")
+
+        print(f"Verified processed audio file exists: {processed_audio_path}")
     except subprocess.CalledProcessError as e:
         cleanup([video_path, audio_path, processed_audio_path])
         print("Audio processing failed:", e.stderr.decode())
