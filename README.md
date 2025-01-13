@@ -11,11 +11,34 @@ Navigate to [hush.andrewvincent.dev](https://hush.andrewvincent.dev/) create an 
 When it's done you will be able to view your video on the site through your account.
 
 ## Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+### Clone the Repo
+```bash
+git clone https://github.com/aavin95/hush@latest
+cd frontend
+```
+and in a second terminal:
+```bash
+cd backend
+```
+### Creating a Python Virtual Environment:
+#### In the backend directory
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+pip install -r requirements.txt
+```
+
+### Building the project
+```bash
+npm run dev
+```
+and in the backend terminal:
+```bash
+python server.py
+```
+
+This setup will start both the frontend and backend servers, allowing you to work on the project locally.
+
 
 ## License
 ISC License
